@@ -93,3 +93,30 @@
     function redirect($location) {
         header("Location: {$location}");
     }
+    
+    function ValidateTitle($title)
+    {
+
+        if (empty($title))
+        {
+            $errorTitle = "Enter a title.";
+        }
+        else
+        {
+            $errorTitle = "";
+        }
+        return $errorTitle;
+    }
+    
+    function ValidateAccess($accessibilty)
+    {
+        if ($accessibilty == "")
+        {
+          $errorAccess = "Choose one";
+        }
+        else
+        {
+            $errorAccess = "";
+        }
+        return $errorAccess;
+    }
