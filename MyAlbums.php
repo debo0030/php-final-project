@@ -28,14 +28,13 @@
                 </tr>
                 <?php 
                    $albums = Album::find_all();
-                   var_dump($albums);
                    foreach ($albums as $album ):
                 ?>
                 <tr>
                     <td><?php echo $album->title?></td>
                     <td><?php echo $album->date_updated?></td>
                     <td></td>
-                    <td><div class="form-group row">
+                <div class="form-group row">
                 <div class="col-sm-5">
                     <select class="form-control" name="accessibility" id="accessibility"onchange="">
                     <option value="">Select Accessibility</option>

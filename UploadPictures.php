@@ -7,24 +7,50 @@
     extract($_POST);
 
     if (isset($btnUpload)) {
-    for ($j=0; $j < count($_FILES['txtUpload']['tmp_name']); $j++) {
+        for ($j=0; $j < count($_FILES['txtUpload']['tmp_name']); $j++) {
        
-        $photo = new Photo();
-        $photo->album_id = $selected_album;
-        $photo->title = $title;
-        $photo->description = $description;
-        $photo->date_added = date("Y-m-d h:i:sa");
-        $photo->set_file($_FILES['txtUpload']['tmp_name']);
-        var_dump($photo);
-        if($photo->save()) {
-            //success
-            $session->message("Upload successful.");
+            $photo = new Photo();
+            $photo->album_id = $selected_album;
+            $photo->title = $title;
+            $photo->description = $description;
+            $photo->date_added = date("Y-m-d h:i:sa");
+            $photo->set_file($_FILES['txtUpload']['tmp_name']);
+            var_dump($photo);
+            
+            if ($_FILES['txtUpload[]']['error'][$j] == 0) { //successful upload
+            $filePath = $photo->save_uploaded_file(ORIGINAL_PICTURES_DIR, $j); //save original uploaded file
+            $imageDetails = getimagesize($filePath);
+        
+            if ($imageDetails && in_array($imageDetails[2], $supportedImageTypes)) {
+                //resize and save file
+                $photo->resamplePicture($filePath, ALBUM_PICTURES_DIR, IMG_MAX_WIDTH, IMG_MAX_HEIGHT);
+                $photo->resamplePicture($filePath, THUMBNAIL_DIR, THUMB_MAX_WIDTH, THUMB_MAX_HEIGHT);
+                $uploadSuccess = "File(s) uploaded successfully!";
+            }
+            else {
+                $error = "Uploaded file is not a supported type";
+                unlink($filePath);
+            }
         }
-        else
-        {
-            $message = join("<br />", $photo->errors);
+        elseif ($_FILES['txtUpload[]']['error'][$j] == 1) { //error
+            $error = "Upload file is too large";
         }
-    }
+        elseif ($_FILES['txtUpload[]']['error'][$j] == 4) { //error
+            $error = "No upload file specified";
+        }
+        else { //error
+           $error = "Error while uploading file. Please try again later.";    
+        }
+        
+//            if($photo->save()) {
+//                //success
+//                $session->message("Upload successful.");
+//            }
+//            else
+//            {
+//                $message = join("<br />", $photo->errors);
+//            }
+        }
     
 }
 ?>
@@ -34,7 +60,7 @@
         <p>Accepted file types: JPG (JPEG), GIF, and PNG</p>
         <p>You can select multiple pictures at one time by holding the shift key while selecting pictures.</p>
         <p>When uploading multiple pictures the title and description fields will be applied to all pictures. </p>
-        <span class="alert-error"><?php echo $message;?></span>
+        <span class="alert-error"><?php echo $error;?></span>
         <form action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="post"  enctype="multipart/form-data">
                 <div class="form-group row">
                 <label for="album" class="col-sm-3 col-form-label text-left">Upload to Album:</label>
