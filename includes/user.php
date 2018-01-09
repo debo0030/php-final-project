@@ -30,4 +30,9 @@
             $the_result_array = self::find_by_query($sql);
             return $the_result_array;       
         }        
+        
+        public static function get_all_albums($user_id)
+        {
+            
+        }
     }
