@@ -42,14 +42,14 @@
             <div class="form-group row">
                 <label for="title" class="col-sm-3 col-form-label text-left">Title:</label>
                 <div class="col-sm-5">
-                    <input type="text" class="form-control" name="title" value="<?php echo $title ?>" />
+                    <input type="text" class="form-control" name="title" value="<?php echo $title ?>" required="required"/>
                 </div>
                 <span class="text-danger inline-block"><?php print $errorTitle?></span>
             </div>
             <div class="form-group row">
                 <label for="accessibility" class="col-sm-3 col-form-label text-left">Accessibility:</label>
                 <div class="col-sm-5">
-                    <select class="form-control" name="accessibility" id="accessibility"onchange="">
+                    <select class="form-control" name="accessibility" id="accessibility"onchange="" required="required">
                     <option value="">Select Accessibility</option>
                     <option value="private">Private</option>
                     <option value="shared">Shared</option>
