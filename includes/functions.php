@@ -110,9 +110,9 @@
     
     function ValidateAccess($accessibilty)
     {
-        if ($accessibilty == "")
+        if ($accessibilty == NULL)
         {
-          $errorAccess = "Choose one";
+          $errorAccess = "Must select one";
         }
         else
         {

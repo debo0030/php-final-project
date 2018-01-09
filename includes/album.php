@@ -11,5 +11,14 @@ class Album extends DB_object
         public $owner_id;
         public $accessibility_code;
         
-        
+        public static function deleteAlbum($albumId) {
+             global $database;        
+            $sql = "DELETE FROM  " . static::$db_table . "  ";
+             $sql .= "WHERE album_id= '" . $database->escape_string($albumId) . "'";
+            $sql .= " LIMIT 1";
+            $database->query($sql);
+            return (mysqli_affected_rows($database->connection) == 1) ? true : false; 
+
+            
+        }
 }

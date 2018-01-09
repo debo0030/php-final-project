@@ -12,10 +12,10 @@
     {
 
         $errorTitle = ValidateTitle($title);
-//        $errorAccess = ValidateAccess($accessibilty);
+        $errorAccess = ValidateAccess($accessibilty);
 
         
-        if((strlen(trim($errorTitle)) != 0) || (strlen(trim($errorAccess)) != 0)) {
+        if((strlen(trim($errorTitle)) != 0)) {
             $validation = FALSE; 
         } elseif (isset($btnClear)) {
             unset($CourseSelected);                        
@@ -42,14 +42,14 @@
             <div class="form-group row">
                 <label for="title" class="col-sm-3 col-form-label text-left">Title:</label>
                 <div class="col-sm-5">
-                    <input type="text" class="form-control" name="title" value="<?php echo $title ?>" required="required"/>
+                    <input type="text" class="form-control" name="title" value="<?php echo $title ?>"/>
                 </div>
                 <span class="text-danger inline-block"><?php print $errorTitle?></span>
             </div>
             <div class="form-group row">
                 <label for="accessibility" class="col-sm-3 col-form-label text-left">Accessibility:</label>
                 <div class="col-sm-5">
-                    <select class="form-control" name="accessibility" id="accessibility"onchange="" required="required">
+                    <select class="form-control" name="accessibility" id="accessibility"onchange="">
                     <option value="">Select Accessibility</option>
                     <option value="private">Private</option>
                     <option value="shared">Shared</option>
