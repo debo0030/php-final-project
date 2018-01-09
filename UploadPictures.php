@@ -15,7 +15,6 @@
             $photo->description = $description;
             $photo->date_added = date("Y-m-d h:i:sa");
             $photo->set_file($_FILES['txtUpload']['tmp_name']);
-            var_dump($photo);
             
             if ($_FILES['txtUpload[]']['error'][$j] == 0) { //successful upload
             $filePath = $photo->save_uploaded_file(ORIGINAL_PICTURES_DIR, $j); //save original uploaded file
