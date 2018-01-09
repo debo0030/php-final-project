@@ -27,7 +27,7 @@
                 $newAlbum->description = $description;
                 $newAlbum->date_updated = date("Y-m-d h:i:sa");
                 $newAlbum->owner_id = $session->user_id;
-                $newAlbum->accessibility_code = "private";
+                $newAlbum->accessibility_code = $accessibility;
                 $newAlbum->create();       
                 
                 redirect("MyAlbums.php");
@@ -70,6 +70,8 @@
             <input type="reset" name="btnReset" value="Reset" class="btn btn-lg btn-success"/>
        </form> 
     </div>
-
+<script type="text/javascript">
+  document.getElementById('accessibility').value = "<?php echo $_GET['accessibility'];?>";
+</script>
 
 <?php include("includes/footer.php");
