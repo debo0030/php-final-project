@@ -14,8 +14,9 @@
             $photo->title = $title;
             $photo->description = $description;
             $photo->date_added = date("Y-m-d h:i:sa");
-            $photo->set_file($_FILES['txtUpload']['tmp_name']);
-            
+            $photo->file_name = $_FILES['txtUpload']['name'][$j]; 
+            $photo->set_file($_FILES['txtUpload']['tmp_name'][$j]);
+                        
             if ($_FILES['txtUpload[]']['error'][$j] == 0) { //successful upload
             $filePath = $photo->save_uploaded_file(ORIGINAL_PICTURES_DIR, $j); //save original uploaded file
             $imageDetails = getimagesize($filePath);
@@ -25,6 +26,7 @@
                 $photo->resamplePicture($filePath, ALBUM_PICTURES_DIR, IMG_MAX_WIDTH, IMG_MAX_HEIGHT);
                 $photo->resamplePicture($filePath, THUMBNAIL_DIR, THUMB_MAX_WIDTH, THUMB_MAX_HEIGHT);
                 $uploadSuccess = "File(s) uploaded successfully!";
+                $photo->create();
             }
             else {
                 $error = "Uploaded file is not a supported type";
@@ -41,14 +43,6 @@
            $error = "Error while uploading file. Please try again later.";    
         }
         
-//            if($photo->save()) {
-//                //success
-//                $session->message("Upload successful.");
-//            }
-//            else
-//            {
-//                $message = join("<br />", $photo->errors);
-//            }
         }
     
 }
