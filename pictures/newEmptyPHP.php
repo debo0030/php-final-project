@@ -11,61 +11,57 @@
     extract($_POST);
     $albums = Album::find_by_owner_id($session->user_id);
 
-    if(isset($_GET['albumId']))
+    if(isset($selected_album)  || isset($_GET['albumId']))
     {
-        $selected_album_id = $_GET['albumId'];
+        $selected_album_id = $selected_album;
         $selectecAlbum = Album::find_album_by_id($selected_album_id, $session->user_id);
         $albumTitle = $selectecAlbum->title;
         $pictures = Photo::get_all_photos($selected_album_id);
         
         if (isset($_GET['pictureId'])) {
             $selectedPic = Photo::getPictureById($_GET['pictureId']);
-            var_dump($_GET['pictureId']);
-            var_dump($selectedPic);
-            if($selectedPic !== false)
-            {
-                if (isset($_GET['btnLeft']))
+                if($selectedPic !== false)
                 {
-                    echo "pokemon";
-                    exit;
-                    rotateImage($selectedPic->getAlbumFilePath(), 90);
-                    rotateImage($selectedPic->getOriginalFilePath(), 90);
-                    rotateImage($selectedPic->getThumbnailFilePath(), 90);
+                    if (isset($_GET['btnLeft']))
+                    {
+                        rotateImage($selectedPic->getAlbumFilePath(), 90);
+                        rotateImage($selectedPic->getOriginalFilePath(), 90);
+                        rotateImage($selectedPic->getThumbnailFilePath(), 90);
 
+                    }
+                    elseif (isset($_GET['btnRight']))
+                    {
+                        rotateImage($selectedPic->getAlbumFilePath(), -90);
+                        rotateImage($selectedPic->getOriginalFilePath(), -90);
+                        rotateImage($selectedPic->getThumbnailFilePath(), -90);
+                    }
+                    elseif (isset($_GET['download'])) 
+                    {
+                        downloadImage($selectedPic->getOriginalFilePath());
+                    }
+                    elseif (isset($_GET['delete'])) 
+                    {
+                        deleteImage($selectedPic);
+                    }
+                    $_SESSION["selectedPicId"] = $selectedPic->picture_id;
+                    header("location: myPictures.php");
                 }
-                elseif (isset($_GET['btnRight']))
-                {
-                    rotateImage($selectedPic->getAlbumFilePath(), -90);
-                    rotateImage($selectedPic->getOriginalFilePath(), -90);
-                    rotateImage($selectedPic->getThumbnailFilePath(), -90);
-                }
-                elseif (isset($_GET['download'])) 
-                {
-                    downloadImage($selectedPic->getOriginalFilePath());
-                }
-                elseif (isset($_GET['delete'])) 
-                {
-                    deleteImage($selectedPic);
-                }
-                $_SESSION["selectedPicId"] = $selectedPic->picture_id;
-                header("location: myPictures.php");
-            }
         }
     }
 ?>
 
     <div class="container text-center">
         <h2>My Pictures</h2><br />
-                <form action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="get">
+                <form action="<?php echo $_SERVER["PHP_SELF"]; ?>" method="post">
                     <div class="col-sm-8">
                         <div class="form-group row">
                             <div class="col-sm-5">
-                                <select class="form-control" name="albumId" id="albumDdl">
+                                <select class="form-control" name="selected_album" onchange="this.form.submit();">
                                 <option value="-1">Select Album</option>
                                 <?php
                                     foreach ($albums as $album): ?>
                                         <option value="<?php echo $album->album_id; ?>"
-                                            <?php if ($_GET['albumId'] == $album->album_id) { echo 'selected'; } ?>>
+                                            <?php if ($_POST['selected_album'] == $album->album_id) { echo 'selected="selected"'; } ?>>
                                             <?php echo $album->title; ?>
                                         </option>
                                 <?php endforeach;?>
@@ -90,17 +86,18 @@
 
                            <div class="row iconRow">
                                <button type="image" name="btnLeft" class="glyphicon glyphicon-repeat gly-flip-horizontal"></button>
-                               <button type="image" name="btnRight" class="glyphicon glyphicon-repeat"></button>
+                               <button type="image" name="btnRight" class="glyphicon glyphicon-repeat" value="andreaRightBtn"></button>
                                <button type="image" name="download" class="glyphicon glyphicon-download-alt"></button>
                                <button type="image" name="delete" class="glyphicon glyphicon-trash" value="delete"></button>   
                            </div>
                            <div class="container iconContainer">
-                               <input type="hidden" name="pictureId" id="pictureId"
-                                   value="<?php if (isset($_GET["pictureId"])) 
+                               <input type="text" name="pictureId" id="pictureId"
+                                   value="<?php if (isset($_SESSION["selectedPicId"])) 
                                                 {
-                                                   echo $_GET["pictureId"];  
+                                                   echo $_SESSION["selectedPicId"];  
                                                 }
                                                 else {
+
                                                     echo $pictures[0]->picture_id;
                                                 }?>"/>
                            </div>
@@ -143,11 +140,7 @@
         </div>
         </form>
     </div>
-    
-    <?php   include("includes/footer.php"); ?>
     <script>
-        $('#albumDdl').on('change', function() {
-            window.location.href = "MyPictures.php?albumId="+$(this).val();
-        });
         <?php include("./includes/scripts.js");?>
     </script>
+    <?php   include("includes/footer.php");

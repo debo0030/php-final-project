@@ -27,23 +27,26 @@
                 <th> </th>
                 </tr>
                 <?php 
-                   $albums = Album::find_all();
+                   $albums = Album::find_by_owner_id($session->user_id);
                    foreach ($albums as $album ):
                 ?>
                 <tr>
                     <td><?php echo $album->title?></td>
                     <td><?php echo $album->date_updated?></td>
                     <td></td>
-                <div class="form-group row">
-                <div class="col-sm-5">
-                    <select class="form-control" name="accessibility" id="accessibility"onchange="">
-                    <option value="">Select Accessibility</option>
-                    <option value="private">Private</option>
-                    <option value="shared">Shared</option>
-                </select>
-                </div>
-                <span class="text-danger inline-block"><?php print $errorAccess?></span>
-            </div>
+                    <td>
+                        <div class="form-group row">
+                            <div class="col-sm-5">
+                                <select class="form-control" name="accessibility" id="accessibility"onchange="">
+                                <option value="">Select Accessibility</option>
+                                <option value="private">Private</option>
+                                <option value="shared">Shared</option>
+                            </select>
+                            </div>
+                            <span class="text-danger inline-block"><?php print $errorAccess?></span>
+                        </div>
+                    </td>
+                
                         <?php // echo $album->accessibility_code?></td>
                     <td>
                         <button type="submit"name="delete" id="delete" onclick="Confirm()" value="<?php echo $album->album_id;?>" >delete</button>

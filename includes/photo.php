@@ -65,7 +65,11 @@
             }
         }
         
-        
+        public function __construct($fileName="", $id="") {
+        $this->fileName = $fileName;
+        $this->id = $id;
+    }
+    
         public static function getPictures() 
         {
         $pictures = array();
@@ -76,24 +80,16 @@
             for ($i = 2; $i < $numFiles; $i++) {
                 $ind = strrpos($files[$i], "/");
                 $file_name = substr($files[$i], $ind); //returns just the picture name, not directory
-                $picture = new Picture ($file_name, $i); //calls constructor
+                $picture = new Photo($file_name, $i); //calls constructor
                 $pictures["$i"] = $picture; //adds to array
             }
         }
         return $pictures; //returns array
         }
 
-        public static function getPictureById($id = "") {
-            $pictures = self::getPictures();
-            foreach($pictures as $pic)
-            {
-                if($pic->getId() == $id)
-                {
-                    return $pic;
-                }
-            }
-
-            return false;
+        public static function getPictureById($id) {
+            $the_result_array = static::find_by_query("SELECT * FROM  " . static::$db_table . "  WHERE picture_id = '$id' LIMIT 1");
+            return !empty($the_result_array) ? array_shift($the_result_array) : false;
         }
 
         public function getId() {
@@ -111,11 +107,10 @@
             global $database;
             $album_id = $database->escape_string($album_id);
 
-            $sql = "SELECT * FROM  " . self::$db_table . " ";
-            $sql .= "WHERE album_id = '{$album_id}'";
-
+            $sql = "SELECT * FROM  " . self::$db_table;
+            $sql .= " WHERE album_id = '{$album_id}'";
             $the_result_array = self::find_by_query($sql);
-            return !empty($the_result_array) ? array_shift($the_result_array) : false;        
+            return !empty($the_result_array) ? $the_result_array : false;        
         }
         
         public function getAlbumFilePath() {
@@ -130,7 +125,7 @@
             return ORIGINAL_PICTURES_DIR."/".$this->file_name;
         }
         
-        function save_uploaded_file ($destinationPath, $j=0) {
+        public function save_uploaded_file ($destinationPath, $j=0) {
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath); 
             }
@@ -154,7 +149,7 @@
             return $filePath;
         }
         
-        function resamplePicture($filePath, $destinationPath, $maxWidth, $maxHeight) {
+        public function resamplePicture($filePath, $destinationPath, $maxWidth, $maxHeight) {
             if (!file_exists($destinationPath)) {
                 mkdir($destinationPath);
             }
@@ -217,35 +212,54 @@
              }
         }
 
-    function rotateImage($filePath, $degrees) {
+        public function rotateImage($filePath, $degrees) {
 
-        $imageDetails = getimagesize($filePath);
+            $imageDetails = getimagesize($filePath);
 
-        $originalFile = null;
+            $originalFile = null;
 
-        if ($imageDetails[2] == IMAGETYPE_JPEG) {
-            $originalFile = imagecreatefromjpeg($filePath);
-        }
-        elseif ($imageDetails[2] == IMAGETYPE_PNG) {
-            $originalFile = imagecreatefrompng($filePath);
-        }
-        elseif ($imageDetails[2] == IMAGETYPE_GIF) {
-            $originalFile = imagecreatefromgif($filePath);
+            if ($imageDetails[2] == IMAGETYPE_JPEG) {
+                $originalFile = imagecreatefromjpeg($filePath);
+            }
+            elseif ($imageDetails[2] == IMAGETYPE_PNG) {
+                $originalFile = imagecreatefrompng($filePath);
+            }
+            elseif ($imageDetails[2] == IMAGETYPE_GIF) {
+                $originalFile = imagecreatefromgif($filePath);
+            }
+
+            $rotatedFile = imagerotate($originalFile, $degrees, 0);
+
+            if ($imageDetails[2] == IMAGETYPE_JPEG) {
+                $success = imagejpeg($rotatedFile, $filePath, 100);
+            }
+            elseif ($imageDetails[2] == IMAGETYPE_PNG) {
+                $success = imagepng($rotatedFile, $filePath, 0);
+            }
+            elseif ($imageDetails[2] == IMAGETYPE_GIF) {
+                $success = imagegif($rotatedFile, $filePath);
+            }
+
+            imagedestroy($rotatedFile);
+            imagedestroy($originalFile);
         }
 
-        $rotatedFile = imagerotate($originalFile, $degrees, 0);
+        
+        public function deleteImage($fileName) {
+    
+            $albumPath = $fileName->getAlbumFilePath();
+            $thumbPath = $fileName->getThumbnailFilePath();
+            $originalPath = $fileName->getOriginalFilePath();
 
-        if ($imageDetails[2] == IMAGETYPE_JPEG) {
-            $success = imagejpeg($rotatedFile, $filePath, 100);
+            unlink($albumPath);
+            unlink($thumbPath);
+            unlink($originalPath);
+            
+            global $database;        
+            $sql = "DELETE FROM  " . self::$db_table . "  ";
+            $sql .= "WHERE picture_id= '" . $database->escape_string($this->picture_id) . "'";
+            $sql .= " LIMIT 1";
+            $database->query($sql);
+            return (mysqli_affected_rows($database->connection) == 1) ? true : false; 
         }
-        elseif ($imageDetails[2] == IMAGETYPE_PNG) {
-            $success = imagepng($rotatedFile, $filePath, 0);
-        }
-        elseif ($imageDetails[2] == IMAGETYPE_GIF) {
-            $success = imagegif($rotatedFile, $filePath);
-        }
-
-        imagedestroy($rotatedFile);
-        imagedestroy($originalFile);
-    }
     }

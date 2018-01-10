@@ -22,9 +22,14 @@ class Album extends DB_object
             
         }
       
+        public static function find_by_owner_id($id) {
+            $the_result_array = static::find_by_query("SELECT * FROM  " . static::$db_table . "  WHERE owner_id = '$id'");
+            return !empty($the_result_array) ? ($the_result_array) : false;
+        }
         
-        public static function find_by_id($id) {
-            $the_result_array = static::find_by_query("SELECT * FROM  " . static::$db_table . "  WHERE album_id = '$id' LIMIT 1");
+        public static function find_album_by_id($id, $owner_id) {
+            $the_result_array = static::find_by_query("SELECT * FROM  " . static::$db_table . "  WHERE album_id = '$id' AND owner_id = '$owner_id' LIMIT 1");
             return !empty($the_result_array) ? array_shift($the_result_array) : false;
         }
+        
 }

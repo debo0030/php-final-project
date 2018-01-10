@@ -66,7 +66,7 @@
             </div>
            
             <br/><br/>
-            <input type="submit" name="btnUpload" value="Upload" class="btn btn-lg btn-success"/>
+            <input type="submit" name="btnUpload" value="Submit" class="btn btn-lg btn-success"/>
             <input type="reset" name="btnReset" value="Reset" class="btn btn-lg btn-success"/>
        </form> 
     </div>

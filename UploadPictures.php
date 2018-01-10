@@ -11,8 +11,8 @@
        
             $photo = new Photo();
             $photo->album_id = $selected_album;
-            $photo->title = $title;
-            $photo->description = $description;
+            $photo->title = htmlspecialchars($title);
+            $photo->description = htmlspecialchars($description);
             $photo->date_added = date("Y-m-d h:i:sa");
             $photo->file_name = $_FILES['txtUpload']['name'][$j]; 
             $photo->set_file($_FILES['txtUpload']['tmp_name'][$j]);
@@ -60,7 +60,7 @@
                 <div class="col-sm-5">
                 <select class="form-control" name="selected_album" onchange="">
                     <option value="-1">Select Album</option>
-                    <?php $albums = Album::find_all();
+                    <?php $albums = Album::find_by_owner_id($session->user_id);
                         foreach ($albums as $album): ?>
                             <option value="<?php echo $album->album_id; ?>"
                                 <?php if ($_POST['selected_album'] == $album->album_id) { echo 'selected="selected"'; } ?>>
