@@ -9,7 +9,8 @@
     }
     
     extract($_POST);
-    $albums = Album::find_by_owner_id($session->user_id);
+    $friend_id = $_GET["friend_id"];
+    $albums = Album::find_shared_album($friend_id);
 
     if(isset($_GET['albumId']))
     {
@@ -20,30 +21,6 @@
         
         if (isset($_GET['pictureId'])) {
             $selectedPic = Photo::getPictureById($_GET['pictureId']);
-            if($selectedPic !== false)
-            {
-                if (isset($_GET['btnLeft']))
-                {
-                    $selectedPic->rotateImage($selectedPic->getAlbumFilePath(), 90);
-                    $selectedPic->rotateImage($selectedPic->getThumbnailFilePath(), 90);
-
-                }
-                elseif (isset($_GET['btnRight']))
-                {
-                    $selectedPic->rotateImage($selectedPic->getAlbumFilePath(), -90);
-                    $selectedPic->rotateImage($selectedPic->getThumbnailFilePath(), -90);
-                }
-                elseif (isset($_GET['download'])) 
-                {
-                    $selectedPic->downloadImage($selectedPic->getOriginalFilePath());
-                }
-                elseif (isset($_GET['delete'])) 
-                {
-                    $selectedPic->deleteImage($selectedPic);
-                    redirect("MyPictures.php?albumId=".$_GET['albumId']);
-                }
-                $_SESSION["selectedPicId"] = $selectedPic->picture_id;
-            }
         }
     }
     if(isset($_POST['btnSubmit']))
@@ -55,7 +32,7 @@
         $comment->date = date("Y-m-d h:i:sa");
        
         $comment->create();
-        redirect("MyPictures.php?albumId=".$_POST["albumId"]);
+        redirect("FriendPictures.php?albumId=".$_POST["albumId"]);
     }
 ?>
 
@@ -96,24 +73,7 @@
                         <?php  endforeach; 
                         endif; ?>
 
-                               <div class="row" >
-                                    <div class="iconRow">
-                                   <button type="image" name="btnLeft" class="glyphicon glyphicon-repeat gly-flip-horizontal"></button>
-                                   <button type="image" name="btnRight" class="glyphicon glyphicon-repeat"></button>
-                                   <button type="image" name="download" class="glyphicon glyphicon-download-alt"></button>
-                                   <button type="image" name="delete" class="glyphicon glyphicon-trash" value="delete"></button>   
-                                    </div>
-                               </div>
-                               <div class="iconContainer">
-                                   <input type="hidden" name="pictureId" id="pictureId"
-                                       value="<?php if (isset($_GET["pictureId"])) 
-                                                    {
-                                                       echo $_GET["pictureId"];  
-                                                    }
-                                                    else {
-                                                        echo $pictures[0]->picture_id;
-                                                    }?>"/>
-                               </div>
+                        
                         </div>
                         <div class="row">
                              <?php
@@ -127,7 +87,7 @@
                                 <div class="column"
                                      data-index ="<?php echo $i; ?>"
                                      data-id="<?php echo $pic->picture_id; ?>">
-                                    <a href="MyPictures.php?pictureId=<?php echo $pic->picture_id; ?>&albumId=<?php echo $pic->album_id; ?>" >
+                                    <a href="FriendPictures.php?pictureId=<?php echo $pic->picture_id; ?>&albumId=<?php echo $pic->album_id; ?>" >
                                        <img class="demo cursor" 
                                          src="<?php print $thumbnail;?>" 
                                          style="width:100%" 
@@ -186,7 +146,7 @@
     <?php   include("includes/footer.php"); ?>
     <script>
         $('#albumDdl').on('change', function() {
-            window.location.href = "MyPictures.php?albumId="+$(this).val();
+            window.location.href = "FriendPictures.php?albumId="+$(this).val();
         });
         <?php include("./includes/scripts.js");?>
     </script>

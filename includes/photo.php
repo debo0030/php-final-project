@@ -243,7 +243,20 @@
             imagedestroy($rotatedFile);
             imagedestroy($originalFile);
         }
-
+        
+        function downloadImage($filePath) {
+            $fileName = basename($filePath);
+            $fileLength = filesize($filePath);
+            header("Content-Type: application/octet-stream");
+            header("Content-Disposition: attachment; filename = \"$fileName\" ");
+            header("Content-Length: $fileLength" );header("Content-Description: File Transfer");
+            header("Expires: 0");   header("Cache-Control: must-revalidate");
+            header("Pragma: private");
+            ob_clean();
+            flush();
+            readfile($filePath);
+            flush();
+        }
         
         public function deleteImage($fileName) {
     

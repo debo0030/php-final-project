@@ -32,4 +32,8 @@ class Album extends DB_object
             return !empty($the_result_array) ? array_shift($the_result_array) : false;
         }
         
+        public static function find_shared_album($id) {
+            $the_result_array = static::find_by_query("SELECT * FROM  " . static::$db_table . "  WHERE owner_id = '$id' AND accessibility_code = 'shared'");
+            return !empty($the_result_array) ? ($the_result_array) : false;
+        }
 }
